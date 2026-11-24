@@ -18,7 +18,7 @@ import math
 import re
 import sqlite3
 from collections import Counter
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -100,7 +100,7 @@ class TravelerMemoryStore:
     ) -> tuple[str, bool]:
         """Scrubs PII and upserts a traveler preference into persistent storage."""
         redaction = self._redactor.redact_text(raw_value.strip())
-        now = datetime.now(tz=timezone.utc).isoformat()
+        now = datetime.now(tz=UTC).isoformat()
         with self._connect() as conn:
             conn.execute(
                 """
@@ -151,7 +151,7 @@ class TravelerMemoryStore:
         redaction = self._redactor.redact_text(raw_memory.strip())
         if not redaction.redacted_text:
             return ""
-        now = datetime.now(tz=timezone.utc).isoformat()
+        now = datetime.now(tz=UTC).isoformat()
         with self._connect() as conn:
             conn.execute(
                 """

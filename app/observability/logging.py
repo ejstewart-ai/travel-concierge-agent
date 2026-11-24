@@ -11,7 +11,7 @@ import json
 import logging
 import os
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from app.observability.pii_redactor import PiiRedactor, get_pii_redactor
@@ -31,7 +31,7 @@ class StructuredJsonFormatter(logging.Formatter):
         redacted_msg = self._redactor.redact_text(raw_message)
 
         log_entry: dict[str, Any] = {
-            "timestamp": datetime.fromtimestamp(record.created, tz=timezone.utc).isoformat(),
+            "timestamp": datetime.fromtimestamp(record.created, tz=UTC).isoformat(),
             "severity": record.levelname,
             "logger": record.name,
             "message": redacted_msg.redacted_text,
