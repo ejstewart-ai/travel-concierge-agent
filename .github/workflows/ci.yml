@@ -1,0 +1,63 @@
+name: CI — Travel Concierge AgentOps Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  lint-and-test:
+    name: Lint, Unit Tests & Eval Schema Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --extra dev
+
+      - name: Check for accidentally committed secrets
+        run: |
+          if git grep -nE '(AIza[0-9A-Za-z\-_]{35}|sk-[A-Za-z0-9]{20,}|BEGIN [A-Z ]*PRIVATE KEY)' -- . ':!.github/workflows/ci.yml'; then
+            echo "ERROR: Potential hardcoded secret detected!"
+            exit 1
+          fi
+
+      - name: Run ruff linter
+        run: uv run ruff check app tests
+
+      - name: Run unit tests and golden eval schema validation
+        run: uv run pytest -v
+
+  terraform-validate:
+    name: Validate Terraform Infrastructure as Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.8"
+
+      - name: Terraform Format Check
+        working-directory: deployment/terraform
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Init (No Backend)
+        working-directory: deployment/terraform
+        run: terraform init -backend=false
+
+      - name: Terraform Validate
+        working-directory: deployment/terraform
+        run: terraform validate

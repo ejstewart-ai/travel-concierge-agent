@@ -1,0 +1,6 @@
+project_id      = "your-gcp-project-id"
+region          = "us-central1"
+service_name    = "travel-concierge-agent"
+container_image = "us-central1-docker.pkg.dev/your-gcp-project-id/travel-concierge-agent/app:latest"
+fast_model      = "gemini-2.5-flash"
+reasoning_model = "gemini-2.5-pro"
