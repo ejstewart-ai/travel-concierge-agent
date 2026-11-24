@@ -16,7 +16,8 @@ dependencies = [
     "pydantic-settings>=2.6.0",
     "python-dotenv>=1.0.1",
     "aiosqlite>=0.20.0",
-    "sqlalchemy>=2.0.35",
+    "sqlalchemy[asyncio]>=2.0.35",
+    "greenlet>=3.1.0",
     "opentelemetry-api>=1.28.0",
     "opentelemetry-sdk>=1.28.0",
     "fastapi>=0.115.0",
@@ -44,6 +45,7 @@ packages = ["app"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
 testpaths = ["tests"]
 pythonpath = ["."]
 
